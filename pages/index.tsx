@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
@@ -9,12 +9,10 @@ import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { SupabaseClient, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home: NextPage = () => {
-  const [inputString, setInputString] = useState("");
-  const [useNow, setUseNow] = useState(true);
-  const [inputDate, setInputDate] = useState(new Date());
-  const [inputNumber, setInputNumber] = useState(0);
+  const stringRef = useRef<HTMLInputElement>(null);
+  const [tableContents, setTableContents] = useState([]);
 
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient();
   
   return (
     <div className={styles.container}>
@@ -27,21 +25,22 @@ const Home: NextPage = () => {
           <h1> Backend Engineer - Jeongwook </h1>
       </div>
       <div className={styles.mainBody}>
-        <StringInputForm />
-        <hr />
-        <TimeInputForm inputDate={inputDate} setInputDate={setInputDate} useNow={useNow} setUseNow={setUseNow}/>
+        <StringInputForm stringRef={stringRef}/>
         <hr />
         <ImageInputForm />
         <hr />
-        <IntInputForm inputNumber={inputNumber} setInputNumber={setInputNumber}/>
-        <hr />
         <div className={styles.submitArea}>
-          <button className={styles.OKbutton} onClick={(e:any) => Submit(supabase, GetInputs(inputString, inputDate, undefined, inputNumber))}>Submit</button>
+          <button 
+            className={styles.OKbutton} 
+            onClick={(e:any) => Submit(supabase, GetInputs((stringRef.current?.value), undefined))}
+          >
+            Submit
+          </button>
         </div>
         <hr />
         <div className={styles.resultArea}>
           <div className={styles.resultAreaBox}>
-
+            
           </div>
         </div>
       </div>
@@ -49,18 +48,46 @@ const Home: NextPage = () => {
   )
 }
 
-const GetInputs = (str: String, date:Date, image:any, number:Number):{} => {
-  return {string: str, timestamp: formatDate(date), image: image, number: number};
+const GetInputs = (str: string|undefined, image:any):{} => {
+  return {string: str, image: image};
 }
 
 const Submit = async ( supabase: SupabaseClient, inputs:any ) => {
-  await supabase
-    .from('dummy')
-    .insert([{ timestamp: inputs.timestamp, 
-               string: inputs.string,
-               number: inputs.number
-               }])
-    alert('Inserted!');
+  const int = await FetchInt( supabase );
+  if (int === null) return;
+  await InsertInput( supabase, int, inputs );
+}
+
+// get the most recent Int from the table
+// run this query and return value if not null
+// SELECT number FROM dummy ORDER BY number DESC LIMIT 1;
+const FetchInt = async ( supabase: SupabaseClient ) => {
+  const t0 = performance.now();
+  let { data, error } = await supabase
+    .from( 'dummy' )
+    .select( 'number' )
+    .order( 'number', { ascending: false } )
+    .limit( 1 );
+  const t1 = performance.now();
+  console.log(`Fetched Int from the table. Time elapsed: ${(t1-t0)} ms`);
+  if ( error !== null ) { alert(`Error ${error.code}: ${error.message}`); return null; }
+  if ( data !== null ) return ( data.length === 0 ? 0 : data[0].number );
+  else return null;
+}
+
+const InsertInput = async ( supabase: SupabaseClient, int: number, inputs: any ) => {
+  const t0 = performance.now();
+  let { error } = await supabase
+    .from( 'dummy' )
+    .insert([{
+      timestamp: formatDate(new Date()), 
+      string: inputs.string,
+      number: int + 1
+    }]);
+  const t1 = performance.now();
+  console.log(`Inserted input to the table. Time elapsed: ${(t1-t0)} ms`);
+  if ( error !== null ) { alert(`Error ${error.code}: ${error.message}`); return null; }
+  else alert('Stored on the server!');
 }
 
 
@@ -68,7 +95,10 @@ const StringInputForm = ( props:any ) => {
   return (
     <div className={styles.inputForm}>
       <label className={styles.labels}>String</label>
-      <input className={styles.inputBox}></input>
+      <input 
+        className={styles.inputBox}
+        ref={props.stringRef}
+      ></input>
     </div>
   );
 }
@@ -76,21 +106,6 @@ const StringInputForm = ( props:any ) => {
 // output date format example: '2022-10-23 16:12:38' (SQL format)
 const formatDate = ( raw:Date ):string => {
   return raw.toISOString().slice(0, 19).replace('T', ' ')
-}
-
-const TimeInputForm = ( props:any ) => {
-  return (
-    <div className={styles.inputForm}>
-      <label className={styles.labels}>Time (UTC)</label>
-      <input className={styles.inputBox} placeholder={formatDate(props.inputDate)}/>
-      <input className={styles.checkBox} 
-             type='checkbox'
-             onClick={()=>{
-                props.setUseNow(!props.useNow);
-             }} 
-             checked={props.useNow}/><span> Use Date.now() as timestamp</span>
-    </div>
-  );
 }
 
 const ImageInputForm = () => {
@@ -102,20 +117,4 @@ const ImageInputForm = () => {
     </div>
   );
 }
-
-const IntInputForm = ( props:any ) => {
-  return (
-    <div className={styles.inputForm}>
-      <label className={styles.labels}>Int</label>
-      <span>{props.inputNumber}</span>
-      <button className={styles.OKbutton} onClick={()=>{
-        props.setInputNumber(props.inputNumber-1);
-      }}>-</button>
-      <button className={styles.OKbutton} onClick={()=>{
-        props.setInputNumber(props.inputNumber+1);
-      }}>+</button>
-    </div>
-  );
-}
-
 export default Home

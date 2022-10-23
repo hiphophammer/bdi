@@ -57,10 +57,13 @@
 .submitArea {
   margin-top: 30px;
   margin-bottom: 20px;
+  align-items: center;
+  align-content: center;
 }
 .resultAreaBox {
-  width: 100%;
+  width: 50%;
   height: 20vh;
   margin: 20px;
+  align-self: center;
   background-color: gray;
 }
