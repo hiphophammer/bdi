@@ -24,11 +24,19 @@
 }
 .inputBox {
   height: 20px;
+  border-radius: 5px;
 }
 .OKbutton {
+  background-color: rgb(64, 131, 255);
+  color: white;
   margin-left: 15px;
   border: solid 1px;
   padding: 5px 20px;
   border-radius: 5px;
-
+}
+.OKbutton:active {
+  background-color:rgb(182, 208, 255);
+}
+.submitArea {
+  margin-top: 30px;
 }
