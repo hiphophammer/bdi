@@ -4,11 +4,17 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { AppProps } from 'next/dist/shared/lib/router/router'
-import { supabase } from '../lib/supabase'
+
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { SupabaseClient, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home: NextPage = () => {
+  const [inputString, setInputString] = useState("");
+  const [useNow, setUseNow] = useState(true);
   const [inputDate, setInputDate] = useState(new Date());
   const [inputNumber, setInputNumber] = useState(0);
+
+  const supabase = useSupabaseClient()
   
   return (
     <div className={styles.container}>
@@ -23,14 +29,14 @@ const Home: NextPage = () => {
       <div className={styles.mainBody}>
         <StringInputForm />
         <hr />
-        <TimeInputForm inputDate={inputDate} setInputDate={setInputDate}/>
+        <TimeInputForm inputDate={inputDate} setInputDate={setInputDate} useNow={useNow} setUseNow={setUseNow}/>
         <hr />
         <ImageInputForm />
         <hr />
         <IntInputForm inputNumber={inputNumber} setInputNumber={setInputNumber}/>
         <hr />
         <div className={styles.submitArea}>
-          <button className={styles.OKbutton}>Submit</button>
+          <button className={styles.OKbutton} onClick={(e:any) => Submit(supabase, GetInputs(inputString, inputDate, undefined, inputNumber))}>Submit</button>
         </div>
         <hr />
         <div className={styles.resultArea}>
@@ -43,26 +49,46 @@ const Home: NextPage = () => {
   )
 }
 
+const GetInputs = (str: String, date:Date, image:any, number:Number):{} => {
+  return {string: str, timestamp: formatDate(date), image: image, number: number};
+}
 
-const StringInputForm = () => {
+const Submit = async ( supabase: SupabaseClient, inputs:any ) => {
+  await supabase
+    .from('dummy')
+    .insert([{ timestamp: inputs.timestamp, 
+               string: inputs.string,
+               number: inputs.number
+               }])
+    alert('Inserted!');
+}
+
+
+const StringInputForm = ( props:any ) => {
   return (
     <div className={styles.inputForm}>
       <label className={styles.labels}>String</label>
       <input className={styles.inputBox}></input>
-      <button className={styles.OKbutton}>OK</button>
     </div>
   );
+}
+
+// output date format example: '2022-10-23 16:12:38' (SQL format)
+const formatDate = ( raw:Date ):string => {
+  return raw.toISOString().slice(0, 19).replace('T', ' ')
 }
 
 const TimeInputForm = ( props:any ) => {
   return (
     <div className={styles.inputForm}>
       <label className={styles.labels}>Time (UTC)</label>
-      <input className={styles.inputBox} placeholder={props.inputDate.toISOString().slice(0, 19).replace('T', ' ')}/>
-      <button className={styles.OKbutton}>OK</button>
-      <button className={styles.OKbutton} onClick={()=>{
-        props.setInputDate();
-      }}>Now</button>
+      <input className={styles.inputBox} placeholder={formatDate(props.inputDate)}/>
+      <input className={styles.checkBox} 
+             type='checkbox'
+             onClick={()=>{
+                props.setUseNow(!props.useNow);
+             }} 
+             checked={props.useNow}/><span> Use Date.now() as timestamp</span>
     </div>
   );
 }

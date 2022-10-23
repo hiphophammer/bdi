@@ -12,7 +12,7 @@
   transform: translate(0, -50%);
 }
 .mainBody {
-  padding-top: 30px;
+  padding-top: 10px;
 }
 .inputForm {
   padding-left: 20px;
@@ -26,13 +26,16 @@
 }
 .labels {
   display:block;
+  margin-bottom: 5px;
 }
 .inputBox {
+  position: relative;
   height: 20px;
-  width: 400px;
+  width: 300px;
   border-radius: 5px;
 }
 .OKbutton {
+  position: relative;
   background-color: rgb(64, 131, 255);
   color: white;
   margin-left: 15px;
@@ -42,6 +45,14 @@
 }
 .OKbutton:active {
   background-color:rgb(182, 208, 255);
+}
+.checkBox {
+  position: relative;
+  transform: translate(0, 4px);
+  margin-left: 15px;
+  width: 18px;
+  height: 18px;
+  border: solid 2px #bcbcbc;
 }
 .submitArea {
   margin-top: 30px;
