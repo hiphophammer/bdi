@@ -4,9 +4,10 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { AppProps } from 'next/dist/shared/lib/router/router'
-import { supabase } from '~/lib/supabase'
+import { supabase } from '../lib/supabase'
 
 const Home: NextPage = () => {
+  const [inputDate, setInputDate] = useState(new Date());
   const [inputNumber, setInputNumber] = useState(0);
   
   return (
@@ -22,7 +23,7 @@ const Home: NextPage = () => {
       <div className={styles.mainBody}>
         <StringInputForm />
         <hr />
-        <TimeInputForm />
+        <TimeInputForm inputDate={inputDate} setInputDate={setInputDate}/>
         <hr />
         <ImageInputForm />
         <hr />
@@ -30,6 +31,12 @@ const Home: NextPage = () => {
         <hr />
         <div className={styles.submitArea}>
           <button className={styles.OKbutton}>Submit</button>
+        </div>
+        <hr />
+        <div className={styles.resultArea}>
+          <div className={styles.resultAreaBox}>
+
+          </div>
         </div>
       </div>
     </div>
@@ -47,13 +54,15 @@ const StringInputForm = () => {
   );
 }
 
-const TimeInputForm = () => {
+const TimeInputForm = ( props:any ) => {
   return (
     <div className={styles.inputForm}>
-      <label className={styles.labels}>Time</label>
-      <input className={styles.inputBox}></input>
+      <label className={styles.labels}>Time (UTC)</label>
+      <input className={styles.inputBox} placeholder={props.inputDate.toISOString().slice(0, 19).replace('T', ' ')}/>
       <button className={styles.OKbutton}>OK</button>
-      <button className={styles.OKbutton}>Now</button>
+      <button className={styles.OKbutton} onClick={()=>{
+        props.setInputDate();
+      }}>Now</button>
     </div>
   );
 }
@@ -61,8 +70,8 @@ const TimeInputForm = () => {
 const ImageInputForm = () => {
   return (
     <div className={styles.inputForm}>
-      <label className={styles.labels}>String</label>
-      <input className={styles.inputBox}></input>
+      <label className={styles.labels}>Image</label>
+      <span className={styles.imageName}></span>
       <button className={styles.OKbutton}>OK</button>
     </div>
   );

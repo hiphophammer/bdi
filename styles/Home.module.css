@@ -19,11 +19,17 @@
   padding-top: 20px;
   padding-bottom: 20px;
 }
+.imageName {
+  background-color:#4E8397;
+  width: 40px;
+  height: 40px;
+}
 .labels {
   display:block;
 }
 .inputBox {
   height: 20px;
+  width: 400px;
   border-radius: 5px;
 }
 .OKbutton {
@@ -39,4 +45,11 @@
 }
 .submitArea {
   margin-top: 30px;
+  margin-bottom: 20px;
+}
+.resultAreaBox {
+  width: 100%;
+  height: 20vh;
+  margin: 20px;
+  background-color: gray;
 }
