@@ -4,6 +4,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { AppProps } from 'next/dist/shared/lib/router/router'
+import { supabase } from '~/lib/supabase'
 
 const Home: NextPage = () => {
   const [inputNumber, setInputNumber] = useState(0);
