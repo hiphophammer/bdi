@@ -14,7 +14,8 @@ const StringInputForm = ( props:any ) => {
 }
 
 const ImageInputForm = ( props:any ) => {
-    
+    const [imgSrcTest, changeSrcImgTest] = useState('');
+
     return (
         <div className={styles.inputForm}>
             <label className={styles.labels}>Image</label>
@@ -37,6 +38,17 @@ const ImageInputForm = ( props:any ) => {
                 style={{display: 'block', marginTop: '5px'}}>
                 {(props.useUpload ? 'URL' : 'Upload')}
             </button>
+            <button
+                onClick={()=>{ changeSrcImgTest(props.imageUrlRef.current.value) }}
+                style={{marginTop: '10px'}}
+            >
+                ㅇㅅㅇ
+            </button>
+            <img 
+                src={imgSrcTest}
+                style={{display: ( props.imgUrlRef === '' ? 'none' : 'block' )}}
+            >
+            </img>
         </div>
     );
 }
@@ -45,10 +57,24 @@ const TableContentBox = ( props:any ) => {
     return (
         <div className={styles.resultAreaBox}>
             {
-                props.tableContents.map( (row: { number: number; timestamp: string; string: string; }) => {
+                props.tableContents.map( (row: { number: number; timestamp: string; string: string; image: {}; }) => {
                     return (
                         <div className={styles.rowDiv}>
-                            {`${row.number}\t${row.timestamp}\t\t${(row.string==='' ? '(Empty string)' : row.string)}`}
+                            <div>
+                                {`${row.number}\t${row.timestamp.replace('T', ' ')}\t\t${(row.string==='' ? '(Empty string)' : row.string)}`}
+                            </div>
+                            <div>
+                                <span
+                                    className={styles.imageDescriptor}
+                                    OnClick={()=>{}}
+                                >
+                                    {row.image === null ? 'No image' : 'Image: click to expand'}
+                                </span>
+                            </div>
+                            <div>
+                                <img />
+                            </div>
+                            
                         </div>
                     )
                 })

@@ -30,7 +30,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/playbook.ico" />
       </Head>
       <div className={styles.navBar}>
-          <h1> Backend Engineer - Jeongwook </h1>
+          <h1> Backend </h1>
       </div>
       <div className={styles.mainBody}>
         <StringInputForm stringRef={stringRef}/>
@@ -44,7 +44,7 @@ const Home: NextPage = () => {
             className={styles.OKbutton} 
             onClick={
               (e:any) => {
-                SubmitHandler(supabase, GetInputs(stringRef.current?.value, undefined), rowLimitRef.current?.value, setTableContents, setShowWarning);
+                SubmitHandler(supabase, GetInputs(stringRef.current?.value, useUpload, (useUpload ? imageUploadRef.current?.value : imageUrlRef.current?.value)), rowLimitRef.current?.value, setTableContents, setShowWarning);
                 setShowTable(true);
             }}
           >
@@ -66,8 +66,14 @@ const Home: NextPage = () => {
   )
 }
 
-const GetInputs = ( str: string|undefined, image:any ):{} => {
-  return {string: str, image: image};
+const GetInputs = ( str: string|undefined, useUpload:boolean, image:any ):{} => {
+  return {
+    string: str,
+    image: {
+      upload: useUpload, 
+      imageURL: image
+    }
+  };
 }
 
 const SubmitHandler = async (
@@ -78,7 +84,7 @@ const SubmitHandler = async (
       setShowWarning
   ) => {
   setShowWarning(false);
-  if ( inputs.string === '' && inputs.image == undefined ) { setShowWarning(true); return; }
+  if ( inputs.string === '' && inputs.image.imageURL === '' ) { setShowWarning(true); return; }
   const nRows = Number( nRowsStr );
   if ( isNaN( nRows ) || nRows < 0 ) { alert('Not a valid entry for number of rows!'); return; }
   if ( nRows > 1000 ) { alert('Number of rows cannot exceed 1000!'); return; }

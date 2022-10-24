@@ -53,4 +53,8 @@ const InsertInput = async ( supabase:SupabaseClient, int:number, inputs:any ) =>
     else alert('Stored on the server!');
 }
 
-  export { FetchInt, FetchTable, InsertInput }
+const InsertImage = async () => {
+    
+}
+
+export { FetchInt, FetchTable, InsertInput }

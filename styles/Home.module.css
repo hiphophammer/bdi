@@ -85,3 +85,6 @@
 .rowDiv {
   background-color: white;
 }
+.imageDescriptor:hover {
+  cursor: pointer;
+}
