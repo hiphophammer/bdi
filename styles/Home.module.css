@@ -20,9 +20,7 @@
   padding-bottom: 20px;
 }
 .imageName {
-  background-color:#4E8397;
-  width: 40px;
-  height: 40px;
+
 }
 .labels {
   display:block;
@@ -33,13 +31,23 @@
   height: 20px;
   width: 300px;
   border-radius: 5px;
+  padding: 1px;
+}
+.queryInputBox {
+  position: relative;
+  display: block;
+  width: 100px;
+  height: 20px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  padding: 1px;
 }
 .OKbutton {
   position: relative;
   background-color: rgb(64, 131, 255);
   color: white;
-  margin-left: 15px;
-  border: solid 1px;
+  margin-left: 0;
+  border: solid 2px rgb(1, 24, 100);
   padding: 5px 20px;
   border-radius: 5px;
 }
@@ -63,14 +71,17 @@
 .submitArea {
   margin-top: 30px;
   margin-bottom: 20px;
+  padding-left: 20px;
   align-items: center;
   align-content: center;
 }
 .resultAreaBox {
   width: 50%;
-  height: 20vh;
   margin: 20px;
-  padding: 10px;
+  padding: 2px;
   align-self: center;
-  background-color: rgb(212, 212, 212);
+  background-color: rgb(43, 43, 43);
+}
+.rowDiv {
+  background-color: white;
 }

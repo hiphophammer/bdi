@@ -4,14 +4,15 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useRef, useState } from 'react'
 
-import { ImageInputForm, StringInputForm } from './components/forms'
-import { FetchInt, InsertInput } from './components/db-access'
+import { ImageInputForm, StringInputForm, TableContentBox } from './components/forms'
+import { FetchInt, FetchTable, InsertInput } from './components/db-access'
 
 
 import { SupabaseClient, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home: NextPage = () => {
   const stringRef = useRef<HTMLInputElement>(null);
+  const queryLimitRef = useRef<HTMLInputElement>(null);
   const [tableContents, setTableContents] = useState([]);
   const [showTable, setShowTable] = useState(false);
 
@@ -33,21 +34,23 @@ const Home: NextPage = () => {
         <ImageInputForm />
         <hr />
         <div className={styles.submitArea}>
+          <div>Number of rows to display:</div>
+          <input className={styles.queryInputBox} ref={queryLimitRef} defaultValue={5}></input>
           <button 
             className={styles.OKbutton} 
             onClick={
               (e:any) => {
-                Submit(supabase, GetInputs((stringRef.current?.value), undefined));
-                ()=>{ setShowTable(true) };
+                SubmitHandler(supabase, GetInputs(stringRef.current?.value, undefined), queryLimitRef.current?.value, setTableContents);
+                setShowTable(true);
             }}
           >
             Submit
           </button>
-          <div className={styles.warning}>A string or image is required.</div>
+          <div className={styles.warning}>A string or image is required!</div>
         </div>
         <div className={styles.resultArea}>
           {
-            showTable === true ? <TableContentBox /> : null
+            showTable === true ? <TableContentBox tableContents={tableContents} /> : null
           }
         </div>
       </div>
@@ -55,22 +58,39 @@ const Home: NextPage = () => {
   )
 }
 
-const TableContentBox = () => {
-  return (
-    <div className={styles.resultAreaBox}>
-      
-    </div>
-  );
-}
-
-const GetInputs = (str: string|undefined, image:any):{} => {
+const GetInputs = ( str: string|undefined, image:any ):{} => {
   return {string: str, image: image};
 }
 
-const Submit = async ( supabase: SupabaseClient, inputs:any ) => {
+const SubmitHandler = async (
+      supabase:SupabaseClient, 
+      inputs:any, 
+      nRowsStr:string|undefined, 
+      setTableContents
+  ) => {
+  const nRows = Number( nRowsStr );
+  if ( isNaN( nRows ) || nRows < 0 ) { alert('Not a valid entry for number of rows!'); return; }
+  if ( nRows > 1000 ) { alert('Number of rows cannot exceed 1000!'); return; }
+  // get the largest entry # from the table
   const int = await FetchInt( supabase );
   if (int === null) return;
+  // insert entry to the table
   await InsertInput( supabase, int, inputs );
+  // wait to fetch table
+  const data = await FetchTable( supabase, nRows );
+  if (data === null) { alert( `Error fetching table!` ); return; }
+  // then update the content for display box
+  await PopulateContent( data, setTableContents );
+}
+
+const PopulateContent = async( data, setTableContents ) => {
+  let contents = [];
+  for (const rowContent of data) {
+    contents.push(rowContent);
+  }
+  // contents will be an array of objects
+  console.log(contents);
+  setTableContents(contents);
 }
 
 export default Home
