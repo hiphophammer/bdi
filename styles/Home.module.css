@@ -1,5 +1,5 @@
 .navBar {
-  background-color: #4E8397;
+  background: linear-gradient(90deg, rgb(16, 60, 156) 0%, rgb(88, 105, 201) 100%);
   color: rgb(243, 243, 243);
   height: 100px;
   padding-left: 15px;
@@ -64,7 +64,7 @@
 }
 .warning {
   margin-top: 5px;
-  margin-left: 15px;
+  font-weight: bold;
   color: red;
   display: none;
 }

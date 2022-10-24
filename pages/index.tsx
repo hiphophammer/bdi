@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useRef, useState } from 'react'
 
 import { ImageInputForm, StringInputForm, TableContentBox } from './components/forms'
 import { FetchInt, FetchTable, InsertInput } from './components/db-access'
@@ -12,9 +12,13 @@ import { SupabaseClient, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home: NextPage = () => {
   const stringRef = useRef<HTMLInputElement>(null);
-  const queryLimitRef = useRef<HTMLInputElement>(null);
+  const rowLimitRef = useRef<HTMLInputElement>(null);
+  const imageUploadRef = useRef<HTMLInputElement>(null);
+  const imageUrlRef = useRef<HTMLInputElement>(null);
+  const [useUpload, setUseUpload] = useState(true);
   const [tableContents, setTableContents] = useState([]);
-  const [showTable, setShowTable] = useState(false);
+  const [showTable, setShowTable] = useState(true);
+  const [showWarning, setShowWarning] = useState(false);
 
   const supabase = useSupabaseClient();
   
@@ -31,22 +35,26 @@ const Home: NextPage = () => {
       <div className={styles.mainBody}>
         <StringInputForm stringRef={stringRef}/>
         <hr />
-        <ImageInputForm />
+        <ImageInputForm imageUploadRef={imageUploadRef} imageUrlRef={imageUrlRef} useUpload={useUpload} setUseUpload={setUseUpload}/>
         <hr />
         <div className={styles.submitArea}>
-          <div>Number of rows to display:</div>
-          <input className={styles.queryInputBox} ref={queryLimitRef} defaultValue={5}></input>
+          <div>Maximum rows to display:</div>
+          <input className={styles.queryInputBox} ref={rowLimitRef} defaultValue={100}></input>
           <button 
             className={styles.OKbutton} 
             onClick={
               (e:any) => {
-                SubmitHandler(supabase, GetInputs(stringRef.current?.value, undefined), queryLimitRef.current?.value, setTableContents);
+                SubmitHandler(supabase, GetInputs(stringRef.current?.value, undefined), rowLimitRef.current?.value, setTableContents, setShowWarning);
                 setShowTable(true);
             }}
           >
             Submit
           </button>
-          <div className={styles.warning}>A string or image is required!</div>
+          <div 
+            className={styles.warning} 
+            style={{display: (showWarning ? 'block' : 'none')}}>
+              A string or image is required!
+          </div>
         </div>
         <div className={styles.resultArea}>
           {
@@ -66,8 +74,11 @@ const SubmitHandler = async (
       supabase:SupabaseClient, 
       inputs:any, 
       nRowsStr:string|undefined, 
-      setTableContents
+      setTableContents: Dispatch<SetStateAction<never[]>>,
+      setShowWarning
   ) => {
+  setShowWarning(false);
+  if ( inputs.string === '' && inputs.image == undefined ) { setShowWarning(true); return; }
   const nRows = Number( nRowsStr );
   if ( isNaN( nRows ) || nRows < 0 ) { alert('Not a valid entry for number of rows!'); return; }
   if ( nRows > 1000 ) { alert('Number of rows cannot exceed 1000!'); return; }
@@ -83,7 +94,7 @@ const SubmitHandler = async (
   await PopulateContent( data, setTableContents );
 }
 
-const PopulateContent = async( data, setTableContents ) => {
+const PopulateContent = async( data:any[], setTableContents ) => {
   let contents = [];
   for (const rowContent of data) {
     contents.push(rowContent);
