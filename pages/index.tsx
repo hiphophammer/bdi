@@ -1,16 +1,19 @@
 import type { NextPage } from 'next'
-import { useRef, useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { AppProps } from 'next/dist/shared/lib/router/router'
+import { useRef, useState } from 'react'
 
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { ImageInputForm, StringInputForm } from './components/forms'
+import { FetchInt, InsertInput } from './components/db-access'
+
+
 import { SupabaseClient, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home: NextPage = () => {
   const stringRef = useRef<HTMLInputElement>(null);
   const [tableContents, setTableContents] = useState([]);
+  const [showTable, setShowTable] = useState(false);
 
   const supabase = useSupabaseClient();
   
@@ -32,20 +35,32 @@ const Home: NextPage = () => {
         <div className={styles.submitArea}>
           <button 
             className={styles.OKbutton} 
-            onClick={(e:any) => Submit(supabase, GetInputs((stringRef.current?.value), undefined))}
+            onClick={
+              (e:any) => {
+                Submit(supabase, GetInputs((stringRef.current?.value), undefined));
+                ()=>{ setShowTable(true) };
+            }}
           >
             Submit
           </button>
+          <div className={styles.warning}>A string or image is required.</div>
         </div>
-        <hr />
         <div className={styles.resultArea}>
-          <div className={styles.resultAreaBox}>
-            
-          </div>
+          {
+            showTable === true ? <TableContentBox /> : null
+          }
         </div>
       </div>
     </div>
   )
+}
+
+const TableContentBox = () => {
+  return (
+    <div className={styles.resultAreaBox}>
+      
+    </div>
+  );
 }
 
 const GetInputs = (str: string|undefined, image:any):{} => {
@@ -58,63 +73,4 @@ const Submit = async ( supabase: SupabaseClient, inputs:any ) => {
   await InsertInput( supabase, int, inputs );
 }
 
-// get the most recent Int from the table
-// run this query and return value if not null
-// SELECT number FROM dummy ORDER BY number DESC LIMIT 1;
-const FetchInt = async ( supabase: SupabaseClient ) => {
-  const t0 = performance.now();
-  let { data, error } = await supabase
-    .from( 'dummy' )
-    .select( 'number' )
-    .order( 'number', { ascending: false } )
-    .limit( 1 );
-  const t1 = performance.now();
-  console.log(`Fetched Int from the table. Time elapsed: ${(t1-t0)} ms`);
-  if ( error !== null ) { alert(`Error ${error.code}: ${error.message}`); return null; }
-  if ( data !== null ) return ( data.length === 0 ? 0 : data[0].number );
-  else return null;
-}
-
-const InsertInput = async ( supabase: SupabaseClient, int: number, inputs: any ) => {
-  const t0 = performance.now();
-  let { error } = await supabase
-    .from( 'dummy' )
-    .insert([{
-      timestamp: formatDate(new Date()), 
-      string: inputs.string,
-      number: int + 1
-    }]);
-  const t1 = performance.now();
-  console.log(`Inserted input to the table. Time elapsed: ${(t1-t0)} ms`);
-  if ( error !== null ) { alert(`Error ${error.code}: ${error.message}`); return null; }
-  else alert('Stored on the server!');
-}
-
-
-const StringInputForm = ( props:any ) => {
-  return (
-    <div className={styles.inputForm}>
-      <label className={styles.labels}>String</label>
-      <input 
-        className={styles.inputBox}
-        ref={props.stringRef}
-      ></input>
-    </div>
-  );
-}
-
-// output date format example: '2022-10-23 16:12:38' (SQL format)
-const formatDate = ( raw:Date ):string => {
-  return raw.toISOString().slice(0, 19).replace('T', ' ')
-}
-
-const ImageInputForm = () => {
-  return (
-    <div className={styles.inputForm}>
-      <label className={styles.labels}>Image</label>
-      <span className={styles.imageName}></span>
-      <button className={styles.OKbutton}>OK</button>
-    </div>
-  );
-}
 export default Home

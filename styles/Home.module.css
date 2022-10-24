@@ -54,6 +54,12 @@
   height: 18px;
   border: solid 2px #bcbcbc;
 }
+.warning {
+  margin-top: 5px;
+  margin-left: 15px;
+  color: red;
+  display: none;
+}
 .submitArea {
   margin-top: 30px;
   margin-bottom: 20px;
@@ -64,6 +70,7 @@
   width: 50%;
   height: 20vh;
   margin: 20px;
+  padding: 10px;
   align-self: center;
-  background-color: gray;
+  background-color: rgb(212, 212, 212);
 }
