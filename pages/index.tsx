@@ -1,14 +1,12 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { Dispatch, SetStateAction, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
-import { ImageInputForm, StringInputForm, TableContentBox } from './components/forms'
-import { FetchInt, FetchTable, InsertInput } from './components/db-access'
+import { ImageInputForm, StringInputForm, TableContentBox } from '../components/forms'
+import { FetchInt, FetchTable, InsertInput } from '../components/db-access'
 
-
-import { SupabaseClient, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home: NextPage = () => {
   const stringRef = useRef<HTMLInputElement>(null);
