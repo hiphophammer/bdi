@@ -2,8 +2,6 @@
 
 This web app stores user input on Supabase and display using Next.js. The app is currently deployed on Vercel.
 
-Please refer to this [document](https://playbookxr.notion.site/Backend-Developer-Interview-98373affa69a41ee8960e02e5427f466) for additional details.
-
 [Test deployment](https://bdi-b23lo55g4-hiphophammer.vercel.app/)
 Note: the data will be displayed upon click of submission button
 
