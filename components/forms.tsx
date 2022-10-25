@@ -28,7 +28,7 @@ const ImageInputForm = ( props:any ) => {
             <input 
                 type='file' 
                 accept="image/*"
-                onChange={(e)=>{if(e.target.files) props.setImageUploadHook(e.target.files[0]);}}
+                onChange={(e)=>{if(!e.target.files) return; props.setImageUploadHook(e.target.files[0]);}}
                 style={{display: (props.useUpload ? 'block' : 'none'), marginBottom: '15px'}}>
             </input>
             <div style={{display: (props.useUpload ? 'none' : 'block'), marginBottom: '5px'}}> URL:</div>
@@ -37,10 +37,12 @@ const ImageInputForm = ( props:any ) => {
                 style={{display: (props.useUpload ? 'none' : 'block')}}
                 ref={props.imageUrlRef}
             ></input>
-            <Image 
-                alt='Preview image'
-                src={(!props.imageUploadHook ? '' : URL.createObjectURL(props.imageUploadHook))}
-            />
+            <div>
+                <img 
+                    style={{display: (!props.imageUploadHook ? 'none' : 'block')}}
+                    src={(!props.imageUploadHook ? '' : URL.createObjectURL(props.imageUploadHook))}
+                />
+            </div>
             <button 
                 className={styles.OKbutton} 
                 onClick={()=>{ purgeInput() }}
@@ -83,7 +85,7 @@ const TableRow = ( props:any ) => {
             </span>
         </div>
         <div>
-            <Image 
+            <img 
                 src={ props.row.image === '' ? '' : props.row.image }
                 alt='image'
                 style={{display: ( !showImage ? 'none' : 'block' )}}

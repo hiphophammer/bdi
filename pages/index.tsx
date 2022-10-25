@@ -75,7 +75,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/playbook.ico" />
       </Head>
       <div className={styles.navBar}>
-          <h1> Backend </h1>
+          <h1> Backend Developer─Jeongwook Oh </h1>
       </div>
       <div className={styles.mainBody}>
         <StringInputForm stringRef={stringRef}/>
