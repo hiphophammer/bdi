@@ -21,11 +21,6 @@ const ImageInputForm = ( props:any ) => {
         props.imageUrlRef.current.value = '';
     }
 
-    const handleUpload = useCallback( (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(!e.target.files) return;
-        props.setImageUploadHook(e.target.files[0]);
-    },[]);
-
     return (
         <div className={styles.inputForm}>
             <label className={styles.labels}>Image</label>
@@ -33,7 +28,7 @@ const ImageInputForm = ( props:any ) => {
             <input 
                 type='file' 
                 accept="image/*"
-                onChange={handleUpload}
+                onChange={(e)=>{if(e.target.files) props.setImageUploadHook(e.target.files[0]);}}
                 style={{display: (props.useUpload ? 'block' : 'none'), marginBottom: '15px'}}>
             </input>
             <div style={{display: (props.useUpload ? 'none' : 'block'), marginBottom: '5px'}}> URL:</div>
