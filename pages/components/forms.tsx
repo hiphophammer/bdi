@@ -1,5 +1,5 @@
 import styles from '../../styles/Home.module.css'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 const StringInputForm = ( props:any ) => {
     return (
@@ -14,7 +14,16 @@ const StringInputForm = ( props:any ) => {
 }
 
 const ImageInputForm = ( props:any ) => {
-    const [imgSrcTest, changeSrcImgTest] = useState('');
+    const purgeInput = () => {
+        props.setUseUpload(!props.useUpload);
+        props.setImageUploadHook(null);
+        props.imageUrlRef.current.value = '';
+    }
+
+    const handleUpload = useCallback( (e: React.ChangeEvent<HTMLInputElement>) => {
+        if(!e.target.files) return;
+        props.setImageUploadHook(e.target.files[0]);
+    },[]);
 
     return (
         <div className={styles.inputForm}>
@@ -23,7 +32,7 @@ const ImageInputForm = ( props:any ) => {
             <input 
                 type='file' 
                 accept="image/*"
-                ref={props.imageUploadRef}
+                onChange={handleUpload}
                 style={{display: (props.useUpload ? 'block' : 'none'), marginBottom: '15px'}}>
             </input>
             <div style={{display: (props.useUpload ? 'none' : 'block'), marginBottom: '5px'}}> URL:</div>
@@ -32,54 +41,59 @@ const ImageInputForm = ( props:any ) => {
                 style={{display: (props.useUpload ? 'none' : 'block')}}
                 ref={props.imageUrlRef}
             ></input>
+            <img 
+                src={(!props.imageUploadHook ? '' : URL.createObjectURL(props.imageUploadHook))}
+            />
             <button 
                 className={styles.OKbutton} 
-                onClick={()=>{ props.setUseUpload(!props.useUpload) }}
+                onClick={()=>{ purgeInput() }}
                 style={{display: 'block', marginTop: '5px'}}>
                 {(props.useUpload ? 'URL' : 'Upload')}
             </button>
-            <button
-                onClick={()=>{ changeSrcImgTest(props.imageUrlRef.current.value) }}
-                style={{marginTop: '10px'}}
-            >
-                ㅇㅅㅇ
-            </button>
-            <img 
-                src={imgSrcTest}
-                style={{display: ( props.imgUrlRef === '' ? 'none' : 'block' )}}
-            >
-            </img>
         </div>
     );
 }
 
 const TableContentBox = ( props:any ) => {
+    const showImage = true;
     return (
         <div className={styles.resultAreaBox}>
-            {
-                props.tableContents.map( (row: { number: number; timestamp: string; string: string; image: {}; }) => {
-                    return (
-                        <div className={styles.rowDiv}>
-                            <div>
-                                {`${row.number}\t${row.timestamp.replace('T', ' ')}\t\t${(row.string==='' ? '(Empty string)' : row.string)}`}
-                            </div>
-                            <div>
-                                <span
-                                    className={styles.imageDescriptor}
-                                    OnClick={()=>{}}
-                                >
-                                    {row.image === null ? 'No image' : 'Image: click to expand'}
-                                </span>
-                            </div>
-                            <div>
-                                <img />
-                            </div>
-                            
-                        </div>
-                    )
-                })
-            }
+        {
+            props.tableContents.map( (row: { number: number; timestamp: string; string: string; image:any ; }) => {
+            return (
+            <div className={styles.rowDiv}>
+                <div>
+                    {`${row.number}\t${row.timestamp.replace('T', ' ')}\t\t${(row.string==='' ? '(No string)' : row.string)}`}
+                </div>
+                <TableRow row={row} />
+            </div>
+            )})
+        }
         </div>
+    );
+}
+
+const TableRow = ( props:any ) => {
+    const [showImage, setShowImage] = useState<boolean>(false);
+    return (
+    <div>
+        <div>
+            <span
+                className={ showImage ? styles.plainText :styles.imageDescriptor }
+                onClick={ ()=>{ setShowImage(!showImage) } }
+            >
+                {props.row.image === '' ? 'No image' : ( showImage ? 'Click to hide' : 'Image: click to expand')}
+            </span>
+        </div>
+        <div>
+            <img 
+                src={ props.row.image === '' ? '' : props.row.image }
+                style={{display: ( !showImage ? 'none' : 'block' )}}
+            />
+        </div>
+    </div>
+
+
     );
 }
 
