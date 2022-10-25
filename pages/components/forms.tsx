@@ -1,5 +1,6 @@
 import styles from '../../styles/Home.module.css'
 import { useCallback, useState } from 'react'
+import Image from 'next/image'
 
 const StringInputForm = ( props:any ) => {
     return (
@@ -41,7 +42,8 @@ const ImageInputForm = ( props:any ) => {
                 style={{display: (props.useUpload ? 'none' : 'block')}}
                 ref={props.imageUrlRef}
             ></input>
-            <img 
+            <Image 
+                alt='Preview image'
                 src={(!props.imageUploadHook ? '' : URL.createObjectURL(props.imageUploadHook))}
             />
             <button 
@@ -61,9 +63,9 @@ const TableContentBox = ( props:any ) => {
         {
             props.tableContents.map( (row: { number: number; timestamp: string; string: string; image:any ; }) => {
             return (
-            <div className={styles.rowDiv}>
+            <div className={styles.rowDiv} key={row.number}>
                 <div>
-                    {`${row.number}\t${row.timestamp.replace('T', ' ')}\t\t${(row.string==='' ? '(No string)' : row.string)}`}
+                    {`${row.number} ${row.timestamp.replace('T', ' ')}  ${(row.string==='' ? '(No string)' : row.string)}`}
                 </div>
                 <TableRow row={row} />
             </div>
@@ -86,8 +88,9 @@ const TableRow = ( props:any ) => {
             </span>
         </div>
         <div>
-            <img 
+            <Image 
                 src={ props.row.image === '' ? '' : props.row.image }
+                alt='image'
                 style={{display: ( !showImage ? 'none' : 'block' )}}
             />
         </div>
